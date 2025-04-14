@@ -22,7 +22,7 @@ class EncounterGenerator:
         themes = ", ".join(tile.get("themes", ["dark"]))
         prompt = (
             f"D&D 5e encounter for {players} level-{level} PCs in Castle Ravenloft's {tile_name}, "
-            f"{themes} themes. Combat with undead monsters only. List monsters, CR, XP (DMG: CR 1=200, CR 2=450). "
+            f"{themes} themes. Combat with undead monsters only. List monsters, CR, XP (DMG: CR 1=200, CR 2=450, CR 3=700). "
             f"2014 rules. Max 50 words, end with 'Total XP: <number>'. No external locations."
         )
 
