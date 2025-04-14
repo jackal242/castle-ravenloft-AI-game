@@ -1,4 +1,4 @@
-#!/Users/jackal/play/castle-ravenloft-game/myenv/bin/python3.13
+#!/Users/jackal/play/castle-ravenloft-AI-game/myenv/bin/python3.13
 # -*- coding: utf-8 -*-
 import re
 import sys
