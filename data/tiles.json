@@ -1,0 +1,5 @@
+[
+  {"name": "Chapel", "type": "named", "themes": ["undead", "holy"]},
+  {"name": "Crypt", "type": "named", "themes": ["undead", "dark"]},
+  {"name": "Corridor", "type": "generic", "event_chance": 0.5}
+]

@@ -1,0 +1,36 @@
+import random
+from ollama import Client
+from src.tile_manager import TileManager
+
+class EncounterGenerator:
+    def __init__(self):
+        self.tiles = TileManager()
+        self.client = Client(host='http://localhost:11434')
+        try:
+            # Ping server
+            self.client.generate(model='mistral', prompt='Ping', options={'num_predict': 1})
+        except Exception as e:
+            print(f"Warning: Ollama not connected: {e}. Using fallback mode.")
+
+    def generate(self, tile_name, players, level):
+        tile = self.tiles.get_tile(tile_name)
+        if tile["type"] == "generic" and random.random() > tile.get("event_chance", 0.5):
+            return f"No encounter in {tile_name}, just eerie silence."
+
+        themes = ", ".join(tile.get("themes", ["dark"]))
+        prompt = (
+            f"Generate a D&D 5e encounter for {players} level-{level} PCs in a {tile_name} "
+            f"with {themes} themes. Choose combat, puzzle, or roleplay. Include monster names, "
+            f"CR, XP, rewards, and environmental effects if any. Follow 2014 and 2024 5e rules. "
+            f"Format as a concise paragraph (max 100 words) ending with 'Total XP: <number>'."
+        )
+
+        try:
+            response = self.client.generate(model='mistral', prompt=prompt)
+            encounter_text = response['response'].strip()
+            return (f"Encounter in {tile_name} ({tile['type']}): {players} level-{level} PCs.\n"
+                    f"{encounter_text}")
+        except Exception as e:
+            return (f"Encounter in {tile_name} ({tile['type']}): {players} level-{level} PCs.\n"
+                    f"Fallback: Fight a shadow in {tile_name}.\n"
+                    f"XP: 50\nReward: None")
