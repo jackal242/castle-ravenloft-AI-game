@@ -3,21 +3,10 @@ import json
 from src.tile_manager import TileManager
 
 class EncounterGenerator:
-    def __init__(self, local_ai=False):
+    def __init__(self, local_ai=False, model="mistral"):
         self.tiles = TileManager()
-        self.client = None
         self.local_ai = local_ai
-        if local_ai:
-            try:
-                import httpx
-                from ollama import Client
-                print("Checking Ollama connection...")
-                self.client = Client(host='http://localhost:11434', timeout=httpx.Timeout(30.0))
-                self.client.generate(model='mistral', prompt='Ping', stream=False, options={'num_predict': 1})
-                print("Ollama connected (using Mistral model).")
-            except Exception as e:
-                print(f"No Ollama server: {e}. Falling back to data mode.")
-                self.local_ai = False
+        self.model = model
 
     def generate(self, tile_name, players, level):
         tile = self.tiles.get_tile(tile_name)
@@ -26,69 +15,39 @@ class EncounterGenerator:
 
         themes = tile.get("themes", ["dark"])
 
-        if not self.local_ai or not self.client:
+        try:
+            with open("data/creatures.json", "r") as f:
+                creatures = json.load(f)
+            with open("data/themes.json", "r") as f:
+                theme_map = json.load(f)
+            xp_budget = self._get_xp_budget(players, level)
+            max_cr = max(1, level + 1)
+            # Filter creatures by CR
+            valid_creatures = [c for c in creatures if float(c["cr"].replace("/", ".")) <= max_cr]
+            if not valid_creatures:
+                valid_creatures = creatures
+            selected = self._select_monsters(valid_creatures, xp_budget, themes, theme_map)
+            encounter_text = "\n".join(f"- {c['name']} (CR {c['cr']}, {c['xp']} XP)" for c in selected)
+            total_xp = sum(int(c['xp']) for c in selected)
+        except Exception as e:
+            print(f"Creature data failed: {e}. Using fallback.")
+            return self._fallback_encounter(tile_name, players, level, tile)
+
+        if self.local_ai:
             try:
-                with open("data/creatures.json", "r") as f:
-                    creatures = json.load(f)
-                with open("data/themes.json", "r") as f:
-                    theme_map = json.load(f)
-                xp_budget = self._get_xp_budget(players, level)
-                max_cr = max(1, level + 1)
-                # Filter creatures by CR
-                valid_creatures = [c for c in creatures if float(c["cr"].replace("/", ".")) <= max_cr]
-                if not valid_creatures:
-                    valid_creatures = creatures
-                selected = self._select_monsters(valid_creatures, xp_budget, themes, theme_map)
-                encounter_text = "\n".join(f"- {c['name']} (CR {c['cr']}, {c['xp']} XP)" for c in selected)
-                total_xp = sum(int(c['xp']) for c in selected)
+                from src.ai_description import AIDescription
+                ai = AIDescription(model=self.model)
+                creature_names = [c['name'] for c in selected]
+                description = ai.generate_description(tile_name, themes, creature_names)
+                return (f"Encounter in {tile_name} ({tile['type']}): {players} level-{level} PCs.\n"
+                        f"{encounter_text}\nTotal XP: {total_xp}\n\nDescription:\n{description}")
+            except Exception as e:
+                print(f"AI description failed: {e}. Skipping description.")
                 return (f"Encounter in {tile_name} ({tile['type']}): {players} level-{level} PCs.\n"
                         f"{encounter_text}\nTotal XP: {total_xp}")
-            except Exception as e:
-                print(f"Creature data failed: {e}. Using fallback.")
-                return self._fallback_encounter(tile_name, players, level, tile)
 
-        # Local AI mode
-        prompt = (
-            f"D&D 5e combat encounter for {players} level-{level} PCs in Castle Ravenloft's {tile_name}, "
-            f"{', '.join(themes)} themes. List monsters from: Giant Spider, Dire Wolf, Swarm of Bats, Shadow Mastiff, Phase Spider, "
-            f"Kobold, Goblin, Green Hag, Night Hag, Barovian Cultist, Grick, Cloaker, Mimic, Otyugh, Animated Armor, Gargoyle, "
-            f"Rug of Smothering, Giant Centipede, Carrion Crawler, Stirge, Will-o'-Wisp, Skeleton, Ghast, Ghoul, Wight, Wraith, "
-            f"Vampire Spawn, Strahd Zombie, Vampiric Mist, Ghost, Specter, Poltergeist, Phantom Warrior, Revenant, Shadow, "
-            f"Boneless, Swarm of Undead Bats, Swarm of Undead Rats, Flameskull, Deathlock, Crawling Claw, Skull Swarm, Mummy, "
-            f"Living Dead Barovian Peasant, Ghost of a Betrayed Bride, Undead Noble Court. "
-            f"Include CR and XP (DMG: CR 1/8=25, CR 1/4=50, CR 1/2=100, CR 1=200, CR 2=450, CR 3=700, CR 4=1100, CR 5=1800). "
-            f"Format as a list with each monster on a new line: '- <Monster> (CR <number>, <XP> XP)'. Max 3 monsters. "
-            f"End with 'Total XP: <sum>'. 2014 rules. Max 50 words. No narrative, no external locations."
-        )
-
-        try:
-            print("Generating encounter...", flush=True)
-            encounter_text = ""
-            for chunk in self.client.generate(model='mistral', prompt=prompt, stream=True, options={'num_predict': 100}):
-                encounter_text += chunk['response']
-            encounter_text = encounter_text.strip()
-            print()  # Newline
-            # Clean up and standardize format
-            lines = encounter_text.split('\n')
-            cleaned_lines = []
-            total_xp = 0
-            for line in lines:
-                if line.strip().startswith('-') or 'Total XP:' in line:
-                    cleaned_lines.append(line.strip())
-                if 'Total XP:' in line:
-                    try:
-                        total_xp = int(re.search(r'Total XP:\s*(\d+)', line).group(1))
-                    except:
-                        total_xp = 0
-            encounter_text = '\n'.join(cleaned_lines)
-            if not any('Total XP:' in line for line in cleaned_lines):
-                print("Warning: Invalid XP in response.")
-                raise ValueError("Invalid XP")
-            return (f"Encounter in {tile_name} ({tile['type']}): {players} level-{level} PCs.\n"
-                    f"{encounter_text}")
-        except Exception as e:
-            print(f"Ollama failed: {e}. Using fallback.")
-            return self._fallback_encounter(tile_name, players, level, tile)
+        return (f"Encounter in {tile_name} ({tile['type']}): {players} level-{level} PCs.\n"
+                f"{encounter_text}\nTotal XP: {total_xp}")
 
     def _get_xp_budget(self, players, level):
         # DMG XP thresholds for a "Medium" encounter per player

@@ -5,20 +5,22 @@ from src.tile_manager import TileManager
 
 def main():
     parser = argparse.ArgumentParser(description="Castle Ravenloft Encounter Generator")
-    parser.add_argument("--local_ai", action="store_true", help="Use local Ollama server")
+    parser.add_argument("--local-ai", action="store_true", help="Use local Ollama server for descriptions")
+    parser.add_argument("--model", type=str, default="mistral", help="Ollama model to use with --local-ai (e.g., mistral, phi3)")
     parser.add_argument("--numplayers", type=int, default=4, help="Number of players")
     parser.add_argument("--level", type=int, default=5, help="Player level")
     args = parser.parse_args()
 
     try:
-        generator = EncounterGenerator(local_ai=args.local_ai)
+        generator = EncounterGenerator(local_ai=args.local_ai, model=args.model)
     except Exception as e:
         print(f"Failed to initialize EncounterGenerator: {e}")
         sys.exit(1)
 
     tiles = TileManager()
 
-    print(f"Castle Ravenloft Encounter Generator (Mode: {'Local AI' if args.local_ai else 'Data File'}, "
+    mode = 'Local AI' if generator.local_ai else 'Data File'
+    print(f"Castle Ravenloft Encounter Generator (Mode: {mode}, "
           f"{args.numplayers} players, level {args.level})")
 
     while True:
