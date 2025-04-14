@@ -1,36 +1,41 @@
-import sys
 import argparse
+import sys
 from src.encounter_generator import EncounterGenerator
 from src.tile_manager import TileManager
 
 def main():
-    # Parse command-line arguments
     parser = argparse.ArgumentParser(description="Castle Ravenloft Encounter Generator")
-    parser.add_argument('--local_ai', action='store_true', help="Use local AI (Ollama)")
-    parser.add_argument('--numplayers', type=int, default=4, help="Number of players (default: 4)")
-    parser.add_argument('--level', type=int, default=3, help="Average player level (default: 3)")
+    parser.add_argument("--local_ai", action="store_true", help="Use local Ollama server")
+    parser.add_argument("--numplayers", type=int, default=4, help="Number of players")
+    parser.add_argument("--level", type=int, default=5, help="Player level")
     args = parser.parse_args()
 
-    local_ai = args.local_ai
-    players = args.numplayers
-    level = args.level
-    mode = "Local AI" if local_ai else "Data File"
-    print(f"Castle Ravenloft Encounter Generator (Mode: {mode}, {players} players, level {level})")
+    try:
+        generator = EncounterGenerator(local_ai=args.local_ai)
+    except Exception as e:
+        print(f"Failed to initialize EncounterGenerator: {e}")
+        sys.exit(1)
+
     tiles = TileManager()
-    generator = EncounterGenerator(local_ai=local_ai)
-    tile_names = tiles.get_tile_names()
-    print(f"Available tiles: {', '.join(tile_names)}")
+
+    print(f"Castle Ravenloft Encounter Generator (Mode: {'Local AI' if args.local_ai else 'Data File'}, "
+          f"{args.numplayers} players, level {args.level})")
+
     while True:
-        tile = input("\nEnter tile (or 'quit'): ").strip()
-        if tile.lower() == 'quit':
+        available_tiles = tiles.get_available_tiles()
+        print(f"Available tiles: {', '.join(available_tiles)}")
+        tile_input = input("Enter tile (or 'quit'): ").strip()
+        if tile_input.lower() == 'quit':
             break
-        if not tile:  # Retry on empty input
+        if tile_input == '?':
+            continue  # Re-print available tiles on next loop
+        tile_name = tiles.resolve_tile_name(tile_input)
+        if tile_name is None:
+            print("Invalid tile or ambiguous input. Please choose from the available tiles.")
             continue
-        # Case-insensitive check
-        if not any(tile.lower() == name.lower() for name in tile_names):
-            print("Invalid tile.")
-            continue
-        print(generator.generate(tile, players, level))
+        encounter = generator.generate(tile_name, args.numplayers, args.level)
+        print(encounter)
+        print()
 
 if __name__ == "__main__":
     main()

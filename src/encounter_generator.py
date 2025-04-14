@@ -24,19 +24,21 @@ class EncounterGenerator:
         if tile["type"] == "generic" and random.random() > tile.get("event_chance", 0.5):
             return f"No encounter in {tile_name}, just eerie silence."
 
-        themes = ", ".join(tile.get("themes", ["dark"]))
+        themes = tile.get("themes", ["dark"])
 
         if not self.local_ai or not self.client:
             try:
                 with open("data/creatures.json", "r") as f:
                     creatures = json.load(f)
-                # Target XP budget based on DMG encounter guidelines
+                with open("data/themes.json", "r") as f:
+                    theme_map = json.load(f)
                 xp_budget = self._get_xp_budget(players, level)
                 max_cr = max(1, level + 1)
+                # Filter creatures by CR
                 valid_creatures = [c for c in creatures if float(c["cr"].replace("/", ".")) <= max_cr]
                 if not valid_creatures:
                     valid_creatures = creatures
-                selected = self._select_monsters(valid_creatures, xp_budget)
+                selected = self._select_monsters(valid_creatures, xp_budget, themes, theme_map)
                 encounter_text = "\n".join(f"- {c['name']} (CR {c['cr']}, {c['xp']} XP)" for c in selected)
                 total_xp = sum(int(c['xp']) for c in selected)
                 return (f"Encounter in {tile_name} ({tile['type']}): {players} level-{level} PCs.\n"
@@ -48,10 +50,13 @@ class EncounterGenerator:
         # Local AI mode
         prompt = (
             f"D&D 5e combat encounter for {players} level-{level} PCs in Castle Ravenloft's {tile_name}, "
-            f"{themes} themes. List monsters from: Giant Spider, Dire Wolf, Swarm of Bats, Shadow Mastiff, Phase Spider, "
+            f"{', '.join(themes)} themes. List monsters from: Giant Spider, Dire Wolf, Swarm of Bats, Shadow Mastiff, Phase Spider, "
             f"Kobold, Goblin, Green Hag, Night Hag, Barovian Cultist, Grick, Cloaker, Mimic, Otyugh, Animated Armor, Gargoyle, "
-            f"Rug of Smothering, Giant Centipede, Carrion Crawler, Stirge, Will-o'-Wisp, Skeleton, Ghast, Wight. "
-            f"Include CR and XP (DMG: CR 1/8=25, CR 1/4=50, CR 1/2=100, CR 1=200, CR 2=450, CR 3=700, CR 4=1100). "
+            f"Rug of Smothering, Giant Centipede, Carrion Crawler, Stirge, Will-o'-Wisp, Skeleton, Ghast, Ghoul, Wight, Wraith, "
+            f"Vampire Spawn, Strahd Zombie, Vampiric Mist, Ghost, Specter, Poltergeist, Phantom Warrior, Revenant, Shadow, "
+            f"Boneless, Swarm of Undead Bats, Swarm of Undead Rats, Flameskull, Deathlock, Crawling Claw, Skull Swarm, Mummy, "
+            f"Living Dead Barovian Peasant, Ghost of a Betrayed Bride, Undead Noble Court. "
+            f"Include CR and XP (DMG: CR 1/8=25, CR 1/4=50, CR 1/2=100, CR 1=200, CR 2=450, CR 3=700, CR 4=1100, CR 5=1800). "
             f"Format as a list with each monster on a new line: '- <Monster> (CR <number>, <XP> XP)'. Max 3 monsters. "
             f"End with 'Total XP: <sum>'. 2014 rules. Max 50 words. No narrative, no external locations."
         )
@@ -95,15 +100,26 @@ class EncounterGenerator:
         # Aim for Medium to Hard encounter (1.5x Medium XP)
         return int(medium_xp * 1.5)
 
-    def _select_monsters(self, creatures, xp_budget):
+    def _select_monsters(self, creatures, xp_budget, themes, theme_map):
         selected = []
         current_xp = 0
         max_attempts = 10
         attempts = 0
+
         while current_xp < xp_budget and attempts < max_attempts:
             remaining_xp = xp_budget - current_xp
-            # Filter creatures that don't overshoot the budget too much
-            valid = [c for c in creatures if int(c['xp']) <= remaining_xp * 1.2]
+            # Prefer creatures matching at least one theme
+            thematic_creatures = []
+            for creature in creatures:
+                for theme in themes:
+                    if creature["name"] in theme_map.get(theme, []):
+                        thematic_creatures.append(creature)
+                        break
+            # Filter by XP
+            valid = [c for c in thematic_creatures if int(c['xp']) <= remaining_xp * 1.2]
+            if not valid:
+                # Fall back to any creature if no thematic matches
+                valid = [c for c in creatures if int(c['xp']) <= remaining_xp * 1.2]
             if not valid:
                 break
             monster = random.choice(valid)
@@ -111,7 +127,12 @@ class EncounterGenerator:
             current_xp += int(monster['xp'])
             attempts += 1
         if not selected:  # Ensure at least one monster
-            selected.append(random.choice(creatures))
+            # Try thematic first
+            thematic_creatures = [c for c in creatures for theme in themes if c["name"] in theme_map.get(theme, [])]
+            if thematic_creatures:
+                selected.append(random.choice(thematic_creatures))
+            else:
+                selected.append(random.choice(creatures))
         return selected[:3]  # Cap at 3 monsters
 
     def _fallback_encounter(self, tile_name, players, level, tile):
