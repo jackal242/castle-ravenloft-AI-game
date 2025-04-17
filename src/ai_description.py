@@ -49,14 +49,14 @@ class AIDescription:
         prompt = (
             f"Describe a D&D 5e encounter in Castle Ravenloft's {tile_name} with {', '.join(themes)} themes. "
             f"Include these monsters: {', '.join(creature_names)}. "
-            f"Write one vivid paragraph (~50 words) describing the room and creatures as they appear. "
+            f"Write one vivid paragraph of no more than 50 words describing the room and creatures as they appear. "
             f"Focus on atmosphere, senses, and monster behavior. Do not list CR, XP, or select monsters. "
             f"No external locations or narrative beyond the room. Use 2014 D&D tone."
         )
 
         try:
             print("Generating AI description...", flush=True)
-            response = self.client.generate(model=self.model, prompt=prompt, stream=False, options={'num_predict': 100})
+            response = self.client.generate(model=self.model, prompt=prompt, stream=False, options={'num_predict': 500})
             description = response['response'].strip()
             print()  # Newline
             return description

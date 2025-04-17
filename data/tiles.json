@@ -1,4 +1,5 @@
 [
+    {"name": "Crypt", "type": "generic", "themes": ["undead", "dark", "burial"], "event_chance": 0.5},
     {"name": "Arcane Circle", "type": "named", "themes": ["magic", "ritual", "mysticism", "eldritch"], "event_chance": 0.8},
     {"name": "Dark Fountain", "type": "named", "themes": ["dark", "magic", "undead", "corruption", "cursed water", "decay"], "event_chance": 0.8},
     {"name": "Corridor", "type": "generic", "themes": ["dark"], "event_chance": 0.5},
@@ -6,6 +7,5 @@
     {"name": "Laboratory", "type": "named", "themes": ["mad science", "alchemy", "magic", "constructs", "fleshcraft", "plague"], "event_chance": 0.8},
     {"name": "Rotting Nook", "type": "named", "themes": ["undead", "decay", "hidden", "dark", "fungus", "filth"], "event_chance": 0.8},
     {"name": "Workshop", "type": "named", "themes": ["constructs", "traps", "machinery", "invention", "forbidden crafts", "arcane tech"], "event_chance": 0.8},
-    {"name": "Crypt", "type": "named", "themes": ["undead", "burial", "ancient", "dark", "holy desecration", "spirits", "bone piles"], "event_chance": 0.8},
     {"name": "Chapel", "type": "named", "themes": ["holy", "desecrated", "undead", "relics", "divine magic", "cursed sanctum"], "event_chance": 0.8}
 ]

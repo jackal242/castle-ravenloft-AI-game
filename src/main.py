@@ -25,17 +25,22 @@ def main():
 
     while True:
         available_tiles = tiles.get_available_tiles()
-        print(f"Available tiles: {', '.join(available_tiles)}")
+        print(f"Available tiles: {', '.join(available_tiles)} (add +skull for harder encounter)")
         tile_input = input("Enter tile (or 'quit'): ").strip()
         if tile_input.lower() == 'quit':
             break
         if tile_input == '?':
             continue  # Re-print available tiles on next loop
+        # Parse +skull modifier
+        skull = False
+        if "+skull" in tile_input.lower():
+            skull = True
+            tile_input = tile_input.lower().replace("+skull", "").strip()
         tile_name = tiles.resolve_tile_name(tile_input)
         if tile_name is None:
             print("Invalid tile or ambiguous input. Please choose from the available tiles.")
             continue
-        encounter = generator.generate(tile_name, args.numplayers, args.level)
+        encounter = generator.generate(tile_name, args.numplayers, args.level, skull)
         print(encounter)
         print()
 
