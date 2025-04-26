@@ -47,12 +47,8 @@ class EncounterGenerator:
 
         try:
             xp_budget = self._get_xp_budget(players, level, skull)
-            max_cr = max(1, level + 2)  # Allow tougher creatures
-            min_cr = max(1, level - 2)  # Exclude very weak creatures
-            valid_creatures = [c for c in self.creatures if min_cr <= float(c["cr"].replace("/", ".")) <= max_cr]
-            if not valid_creatures:
-                valid_creatures = [c for c in self.creatures if float(c["cr"].replace("/", ".")) <= max_cr]
-            selected = self._select_monsters(valid_creatures, xp_budget, themes, self.theme_map, skull, tile["type"])
+            # Pass all creatures without CR filtering
+            selected = self._select_monsters(self.creatures, xp_budget, themes, self.theme_map, skull, tile["type"])
             encounter_text = "\n".join(f"- {c['name']} (CR {c['cr']}, {c['xp']} XP)" for c in selected)
             total_xp = sum(int(c['xp']) for c in selected)
         except Exception as e:
@@ -83,7 +79,6 @@ class EncounterGenerator:
             16: 3200, 17: 3900, 18: 4200, 19: 5000, 20: 5700
         }
         medium_xp = xp_per_player.get(level, 500) * players
-        # Adjust for desired difficulty: Medium-to-Hard without skull, Hard-to-Deadly with skull
         base_multiplier = 1.5 if skull else 1.0
         return int(medium_xp * base_multiplier)
 
@@ -92,41 +87,35 @@ class EncounterGenerator:
         current_xp = 0
         max_attempts = 20
         attempts = 0
-        # Target 80-120% of XP budget for flexibility
-        min_xp_target = int(xp_budget * 0.8)
-        max_xp_target = int(xp_budget * 1.2)
-        # Aim for 2-4 monsters, more with skull
+        min_xp_target = int(xp_budget * 0.8)  # 1600 for 2000 budget
+        max_xp_target = int(xp_budget * 1.2)  # 2400 for 2000 budget
         target_count = random.randint(3, 5) if skull else random.randint(2, 4)
-
-        # Sort creatures by XP descending to prefer stronger ones
-        creatures.sort(key=lambda x: int(x['xp']), reverse=True)
 
         while current_xp < min_xp_target and attempts < max_attempts and len(selected) < target_count:
             remaining_xp = max_xp_target - current_xp
-            # For generic tiles, allow all creatures; for named, prefer thematic
-            valid = creatures if tile_type == "generic" else []
-            if tile_type != "generic":
-                thematic_creatures = []
-                for creature in creatures:
-                    for theme in themes:
-                        if creature["name"] in theme_map.get(theme, []):
-                            thematic_creatures.append(creature)
-                            break
-                valid = [c for c in thematic_creatures if int(c['xp']) <= remaining_xp]
-                if not valid:
-                    valid = [c for c in creatures if int(c['xp']) <= remaining_xp]
-            else:
+            # Build list of thematic creatures
+            thematic_creatures = [
+                c for c in creatures
+                for theme in themes
+                if c["name"] in theme_map.get(theme, [])
+            ]
+            # Select thematic creatures that fit XP budget
+            valid = [c for c in thematic_creatures if int(c['xp']) <= remaining_xp]
+            # Fallback to all creatures if no thematic options
+            if not valid:
                 valid = [c for c in creatures if int(c['xp']) <= remaining_xp]
 
             if not valid:
                 break
-            # Prefer higher-XP creatures, but allow random selection for variety
+
+            # Sort by XP descending to prefer stronger creatures
             valid.sort(key=lambda x: int(x['xp']), reverse=True)
-            # Allow slight overshooting
+            # Ensure we don’t exceed max XP
             valid = [c for c in valid if current_xp + int(c['xp']) <= max_xp_target]
             if not valid:
                 break
-            # Weight selection toward higher XP
+
+            # Select from top half for variety and challenge
             top_half = valid[:max(1, len(valid)//2)]
             monster = random.choice(top_half)
             selected.append(monster)
@@ -135,7 +124,8 @@ class EncounterGenerator:
 
         if not selected:  # Ensure at least one monster
             valid = [c for c in creatures if int(c['xp']) <= xp_budget]
-            selected.append(random.choice(valid))
+            if valid:
+                selected.append(random.choice(valid))
 
         return selected[:5]  # Cap at 5 monsters
 

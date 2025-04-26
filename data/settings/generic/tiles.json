@@ -14,7 +14,7 @@
     {"name": "Desert Oasis", "type": "generic", "themes": ["Desert and Wasteland", "Aquatic Dwellers"], "event_chance": 0.5},
     {"name": "Frozen Tundra", "type": "generic", "themes": ["Frozen Wastes", "Giant Clans"], "event_chance": 0.55},
     {"name": "Volcanic Caldera", "type": "generic", "themes": ["Volcanic Depths", "Elemental Forces"], "event_chance": 0.8},
-    {"name": "Fungal Plants", "type": "generic", "themes": ["Fungal Growth", "Forest Dwellers"], "event_chance": 0.6},
+    {"name": "Myconid Grove", "type": "generic", "themes": ["Fungal Growth", "Forest Dwellers"], "event_chance": 0.6},
     {"name": "Menagerie Keep", "type": "generic", "themes": ["Menagerie of Monsters", "Constructed Defenders"], "event_chance": 0.7},
     {"name": "Sunken Temple", "type": "generic", "themes": ["Aquatic Dwellers", "Forgotten Tombs"], "event_chance": 0.75},
     {"name": "Celestial Prison", "type": "generic", "themes": ["Celestial Prisoners", "Arcane Guardians"], "event_chance": 0.8},
