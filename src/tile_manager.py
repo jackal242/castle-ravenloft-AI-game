@@ -11,10 +11,11 @@ class TileManager:
     def load_tiles(self):
         tile_file = f"data/settings/{self.setting}/tiles.json"
         if self.debug:
-            print(f"Attempting to load tiles from: {tile_file}")
+            print(f"Loading tiles from: {tile_file}")
         if not os.path.exists(tile_file):
             if self.debug:
                 print(f"Setting '{self.setting}' not found, falling back to ravenloft")
+            self.setting = "ravenloft"  # Globally update setting
             tile_file = "data/settings/ravenloft/tiles.json"
         try:
             with open(tile_file, "r") as f:

@@ -15,7 +15,7 @@ def main():
 
     try:
         tiles = TileManager(setting=args.setting, debug=args.debug)
-        generator = EncounterGenerator(tile_manager=tiles, local_ai=args.local_ai, model=args.model, setting=args.setting, debug=args.debug)
+        generator = EncounterGenerator(tile_manager=tiles, local_ai=args.local_ai, model=args.model, setting=tiles.setting, debug=args.debug)
     except Exception as e:
         print(f"Failed to initialize EncounterGenerator: {e}")
         sys.exit(1)

@@ -10,6 +10,33 @@ class EncounterGenerator:
         self.model = model
         self.setting = setting
         self.debug = debug
+        self.creatures = []
+        self.theme_map = {}
+
+        # Load creatures and themes at initialization
+        creatures_file = f"data/settings/{self.setting}/creatures.json"
+        themes_file = f"data/settings/{self.setting}/themes.json"
+        try:
+            if self.debug:
+                print(f"Loading creatures from: {creatures_file}")
+            with open(creatures_file, "r") as f:
+                self.creatures = json.load(f)
+            if self.debug:
+                print(f"Successfully loaded creatures from: {creatures_file}")
+        except Exception as e:
+            print(f"Failed to load creatures: {e}. Using empty creature list.")
+            self.creatures = []
+
+        try:
+            if self.debug:
+                print(f"Loading themes from: {themes_file}")
+            with open(themes_file, "r") as f:
+                self.theme_map = json.load(f)
+            if self.debug:
+                print(f"Successfully loaded themes from: {themes_file}")
+        except Exception as e:
+            print(f"Failed to load themes: {e}. Using empty theme map.")
+            self.theme_map = {}
 
     def generate(self, tile_name, players, level, skull=False):
         tile = self.tiles.get_tile(tile_name)
@@ -19,26 +46,13 @@ class EncounterGenerator:
         themes = tile.get("themes", ["dark"])
 
         try:
-            creatures_file = f"data/settings/{self.setting}/creatures.json"
-            themes_file = f"data/settings/{self.setting}/themes.json"
-            if self.debug:
-                print(f"Loading creatures from: {creatures_file}")
-                print(f"Loading themes from: {themes_file}")
-            with open(creatures_file, "r") as f:
-                creatures = json.load(f)
-            if self.debug:
-                print(f"Successfully loaded creatures from: {creatures_file}")
-            with open(themes_file, "r") as f:
-                theme_map = json.load(f)
-            if self.debug:
-                print(f"Successfully loaded themes from: {themes_file}")
             xp_budget = self._get_xp_budget(players, level, skull)
-            max_cr = max(1, level + 1)
-            min_cr = max(1, level // 2)  # Minimum CR for challenge
-            valid_creatures = [c for c in creatures if min_cr <= float(c["cr"].replace("/", ".")) <= max_cr]
+            max_cr = max(1, level + 2)  # Allow tougher creatures
+            min_cr = max(1, level - 2)  # Exclude very weak creatures
+            valid_creatures = [c for c in self.creatures if min_cr <= float(c["cr"].replace("/", ".")) <= max_cr]
             if not valid_creatures:
-                valid_creatures = [c for c in creatures if float(c["cr"].replace("/", ".")) <= max_cr]
-            selected = self._select_monsters(valid_creatures, xp_budget, themes, theme_map, skull, tile["type"])
+                valid_creatures = [c for c in self.creatures if float(c["cr"].replace("/", ".")) <= max_cr]
+            selected = self._select_monsters(valid_creatures, xp_budget, themes, self.theme_map, skull, tile["type"])
             encounter_text = "\n".join(f"- {c['name']} (CR {c['cr']}, {c['xp']} XP)" for c in selected)
             total_xp = sum(int(c['xp']) for c in selected)
         except Exception as e:
@@ -64,36 +78,34 @@ class EncounterGenerator:
     def _get_xp_budget(self, players, level, skull):
         # DMG XP thresholds for a "Medium" encounter per player
         xp_per_player = {
-            1: 25, 2: 50, 3: 75, 4: 125, 5: 250, 6: 300, 7: 350, 8: 450,
-            9: 550, 10: 600, 11: 800, 12: 1000, 13: 1100, 14: 1250, 15: 1400,
-            16: 1600, 17: 2000, 18: 2100, 19: 2400, 20: 2800
+            1: 50, 2: 100, 3: 150, 4: 250, 5: 500, 6: 600, 7: 750, 8: 900,
+            9: 1100, 10: 1200, 11: 1600, 12: 2000, 13: 2200, 14: 2500, 15: 2800,
+            16: 3200, 17: 3900, 18: 4200, 19: 5000, 20: 5700
         }
-        medium_xp = xp_per_player.get(level, 250) * players
-        # Medium-to-Hard (1.5x) without skull, Hard-to-Deadly (2.0x) with skull
-        multiplier = 2.0 if skull else 1.5
-        return int(medium_xp * multiplier)
+        medium_xp = xp_per_player.get(level, 500) * players
+        # Adjust for desired difficulty: Medium-to-Hard without skull, Hard-to-Deadly with skull
+        base_multiplier = 1.5 if skull else 1.0
+        return int(medium_xp * base_multiplier)
 
     def _select_monsters(self, creatures, xp_budget, themes, theme_map, skull, tile_type):
         selected = []
         current_xp = 0
-        max_attempts = 15
+        max_attempts = 20
         attempts = 0
-        # Target 90-100% of XP budget
-        min_xp_target = int(xp_budget * 0.9)
-        max_xp_target = int(xp_budget * 1.0)
-        # Prefer 2-3 monsters, fallback to 1 if budget is tight
-        target_count = random.randint(2, 3) if xp_budget >= 1000 else 1
-        target_count = random.randint(2, 3) if skull else target_count
+        # Target 80-120% of XP budget for flexibility
+        min_xp_target = int(xp_budget * 0.8)
+        max_xp_target = int(xp_budget * 1.2)
+        # Aim for 2-4 monsters, more with skull
+        target_count = random.randint(3, 5) if skull else random.randint(2, 4)
 
-        # Shuffle creatures for variety
-        random.shuffle(creatures)
+        # Sort creatures by XP descending to prefer stronger ones
+        creatures.sort(key=lambda x: int(x['xp']), reverse=True)
 
         while current_xp < min_xp_target and attempts < max_attempts and len(selected) < target_count:
             remaining_xp = max_xp_target - current_xp
-            # For generic tiles, prioritize variety over strict theme matching
+            # For generic tiles, allow all creatures; for named, prefer thematic
             valid = creatures if tile_type == "generic" else []
             if tile_type != "generic":
-                # Prefer thematic creatures for non-generic tiles
                 thematic_creatures = []
                 for creature in creatures:
                     for theme in themes:
@@ -108,13 +120,15 @@ class EncounterGenerator:
 
             if not valid:
                 break
-            # Sort by XP to prefer monsters that fill the budget
+            # Prefer higher-XP creatures, but allow random selection for variety
             valid.sort(key=lambda x: int(x['xp']), reverse=True)
-            # Pick a monster that keeps us within max_xp_target
+            # Allow slight overshooting
             valid = [c for c in valid if current_xp + int(c['xp']) <= max_xp_target]
             if not valid:
                 break
-            monster = random.choice(valid)
+            # Weight selection toward higher XP
+            top_half = valid[:max(1, len(valid)//2)]
+            monster = random.choice(top_half)
             selected.append(monster)
             current_xp += int(monster['xp'])
             attempts += 1
@@ -123,26 +137,18 @@ class EncounterGenerator:
             valid = [c for c in creatures if int(c['xp']) <= xp_budget]
             selected.append(random.choice(valid))
 
-        return selected[:3]  # Cap at 3 monsters
+        return selected[:5]  # Cap at 5 monsters
 
     def _fallback_encounter(self, tile_name, players, level, tile):
-        creatures_file = f"data/settings/{self.setting}/creatures.json"
-        if self.debug:
-            print(f"Loading creatures for fallback from: {creatures_file}")
-        try:
-            with open(creatures_file, "r") as f:
-                creatures = json.load(f)
-            if self.debug:
-                print(f"Successfully loaded creatures from: {creatures_file}")
-            max_cr = max(1, level)
-            valid_creatures = [c for c in creatures if float(c["cr"].replace("/", ".")) <= max_cr]
-            if not valid_creatures:
-                valid_creatures = creatures
+        max_cr = max(1, level)
+        valid_creatures = [c for c in self.creatures if float(c["cr"].replace("/", ".")) <= max_cr]
+        if not valid_creatures:
+            valid_creatures = self.creatures
+        if valid_creatures:
             monster = random.choice(valid_creatures)
             return (f"Encounter in {tile_name} ({tile['type']}): {players} level-{level} PCs.\n"
                     f"- {monster['name']} (CR {monster['cr']}, {monster['xp']} XP)\n"
                     f"DC 12 Wisdom save avoids fear.\nReward: Potion of healing\nTotal XP: {monster['xp']}")
-        except Exception:
-            return (f"Encounter in {tile_name} ({tile['type']}): {players} level-{level} PCs.\n"
-                    f"- Mimic (CR 2, 450 XP)\n"
-                    f"DC 12 Wisdom save avoids fear.\nReward: Potion of healing\nTotal XP: 450")
+        return (f"Encounter in {tile_name} ({tile['type']}): {players} level-{level} PCs.\n"
+                f"- Mimic (CR 2, 450 XP)\n"
+                f"DC 12 Wisdom save avoids fear.\nReward: Potion of healing\nTotal XP: 450")
