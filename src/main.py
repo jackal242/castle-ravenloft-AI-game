@@ -9,19 +9,20 @@ def main():
     parser.add_argument("--model", type=str, default="mistral", help="Ollama model to use with --local-ai (e.g., mistral, phi3)")
     parser.add_argument("--numplayers", type=int, default=4, help="Number of players")
     parser.add_argument("--level", type=int, default=5, help="Player level")
+    parser.add_argument("--setting", type=str, default="ravenloft", help="Game setting (e.g., ravenloft, generic)")
+    parser.add_argument("--debug", action="store_true", help="Enable debug logging for file loading")
     args = parser.parse_args()
 
     try:
-        generator = EncounterGenerator(local_ai=args.local_ai, model=args.model)
+        tiles = TileManager(setting=args.setting, debug=args.debug)
+        generator = EncounterGenerator(tile_manager=tiles, local_ai=args.local_ai, model=args.model, setting=args.setting, debug=args.debug)
     except Exception as e:
         print(f"Failed to initialize EncounterGenerator: {e}")
         sys.exit(1)
 
-    tiles = TileManager()
-
     mode = 'Local AI' if generator.local_ai else 'Data File'
     print(f"Castle Ravenloft Encounter Generator (Mode: {mode}, "
-          f"{args.numplayers} players, level {args.level})")
+          f"{args.numplayers} players, level {args.level}, setting: {args.setting})")
 
     while True:
         available_tiles = tiles.get_available_tiles()

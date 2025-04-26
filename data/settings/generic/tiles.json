@@ -1,0 +1,6 @@
+[
+    {"name": "Dungeon Cell", "type": "named", "themes": ["dungeon"], "event_chance": 0.7},
+    {"name": "Forest Clearing", "type": "generic", "themes": ["wild"], "event_chance": 0.5},
+    {"name": "Guard Post", "type": "named", "themes": ["humanoid"], "event_chance": 0.8},
+    {"name": "Ancient Ruin", "type": "named", "themes": ["ancient"], "event_chance": 0.7}
+]

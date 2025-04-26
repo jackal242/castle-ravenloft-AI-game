@@ -2,14 +2,25 @@ import json
 import os
 
 class TileManager:
-    def __init__(self):
+    def __init__(self, setting="ravenloft", debug=False):
         self.tiles = []
+        self.setting = setting
+        self.debug = debug
         self.load_tiles()
 
     def load_tiles(self):
+        tile_file = f"data/settings/{self.setting}/tiles.json"
+        if self.debug:
+            print(f"Attempting to load tiles from: {tile_file}")
+        if not os.path.exists(tile_file):
+            if self.debug:
+                print(f"Setting '{self.setting}' not found, falling back to ravenloft")
+            tile_file = "data/settings/ravenloft/tiles.json"
         try:
-            with open("data/tiles.json", "r") as f:
+            with open(tile_file, "r") as f:
                 self.tiles = json.load(f)
+            if self.debug:
+                print(f"Successfully loaded tiles from: {tile_file}")
         except FileNotFoundError:
             print("Tiles file not found, using defaults.")
             self.tiles = [

@@ -1,0 +1,7 @@
+[
+    {"name": "Goblin", "type": "humanoid", "cr": "1/4", "xp": 50, "notes": "Skirmisher in dungeons"},
+    {"name": "Orc", "type": "humanoid", "cr": "1/2", "xp": 100, "notes": "Raider in wilds"},
+    {"name": "Wolf", "type": "beast", "cr": "1/4", "xp": 50, "notes": "Pack hunter in forests"},
+    {"name": "Skeleton", "type": "undead", "cr": "1/4", "xp": 50, "notes": "Guardian in ruins"},
+    {"name": "Bandit", "type": "humanoid", "cr": "1/8", "xp": 25, "notes": "Ambusher at guard posts"}
+]

@@ -1,12 +1,15 @@
 import random
 import json
+import os
 from src.tile_manager import TileManager
 
 class EncounterGenerator:
-    def __init__(self, local_ai=False, model="mistral"):
-        self.tiles = TileManager()
+    def __init__(self, tile_manager, local_ai=False, model="mistral", setting="ravenloft", debug=False):
+        self.tiles = tile_manager
         self.local_ai = local_ai
         self.model = model
+        self.setting = setting
+        self.debug = debug
 
     def generate(self, tile_name, players, level, skull=False):
         tile = self.tiles.get_tile(tile_name)
@@ -16,10 +19,19 @@ class EncounterGenerator:
         themes = tile.get("themes", ["dark"])
 
         try:
-            with open("data/creatures.json", "r") as f:
+            creatures_file = f"data/settings/{self.setting}/creatures.json"
+            themes_file = f"data/settings/{self.setting}/themes.json"
+            if self.debug:
+                print(f"Loading creatures from: {creatures_file}")
+                print(f"Loading themes from: {themes_file}")
+            with open(creatures_file, "r") as f:
                 creatures = json.load(f)
-            with open("data/themes.json", "r") as f:
+            if self.debug:
+                print(f"Successfully loaded creatures from: {creatures_file}")
+            with open(themes_file, "r") as f:
                 theme_map = json.load(f)
+            if self.debug:
+                print(f"Successfully loaded themes from: {themes_file}")
             xp_budget = self._get_xp_budget(players, level, skull)
             max_cr = max(1, level + 1)
             min_cr = max(1, level // 2)  # Minimum CR for challenge
@@ -53,7 +65,8 @@ class EncounterGenerator:
         # DMG XP thresholds for a "Medium" encounter per player
         xp_per_player = {
             1: 25, 2: 50, 3: 75, 4: 125, 5: 250, 6: 300, 7: 350, 8: 450,
-            9: 550, 10: 600, 11: 800, 12: 1000, 13: 1100, 14: 1250, 15: 1400
+            9: 550, 10: 600, 11: 800, 12: 1000, 13: 1100, 14: 1250, 15: 1400,
+            16: 1600, 17: 2000, 18: 2100, 19: 2400, 20: 2800
         }
         medium_xp = xp_per_player.get(level, 250) * players
         # Medium-to-Hard (1.5x) without skull, Hard-to-Deadly (2.0x) with skull
@@ -113,9 +126,14 @@ class EncounterGenerator:
         return selected[:3]  # Cap at 3 monsters
 
     def _fallback_encounter(self, tile_name, players, level, tile):
+        creatures_file = f"data/settings/{self.setting}/creatures.json"
+        if self.debug:
+            print(f"Loading creatures for fallback from: {creatures_file}")
         try:
-            with open("data/creatures.json", "r") as f:
+            with open(creatures_file, "r") as f:
                 creatures = json.load(f)
+            if self.debug:
+                print(f"Successfully loaded creatures from: {creatures_file}")
             max_cr = max(1, level)
             valid_creatures = [c for c in creatures if float(c["cr"].replace("/", ".")) <= max_cr]
             if not valid_creatures:

@@ -1,0 +1,6 @@
+{
+    "dungeon": ["Goblin", "Skeleton"],
+    "wild": ["Orc", "Wolf"],
+    "humanoid": ["Goblin", "Orc", "Bandit"],
+    "ancient": ["Skeleton"]
+}
