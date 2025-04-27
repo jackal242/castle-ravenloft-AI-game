@@ -92,7 +92,7 @@ class EncounterGenerator:
         current_xp = 0
         max_attempts = 50
         min_xp_target = int(xp_budget * 0.8)  # e.g., 1600 for 2000 budget
-        max_xp_target = int(xp_budget * 1.2)  # e.g., 2400 for 2000 budget
+        max_xp_target = int(xp_budget * 1.1)  # e.g., 2200 for 2000 budget
         max_monsters = 15
         attempts = 0
         selected_types = set()
@@ -100,7 +100,7 @@ class EncounterGenerator:
         # Determine target number of unique creatures
         target_unique = random.choices(
             [1, 2, 3, 4, 5],
-            weights=[0.56, 0.19, 0.10, 0.10, 0.05],
+            weights=[0.50, 0.41, 0.05, 0.03, 0.01],
             k=1
         )[0]
 

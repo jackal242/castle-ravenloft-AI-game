@@ -20,7 +20,7 @@ class AIDescription:
                 raise ConnectionError("Ollama server not running on localhost:11434")
 
             # Initialize client with reduced timeout
-            self.client = Client(host='http://localhost:11434', timeout=httpx.Timeout(10.0))
+            self.client = Client(host='http://localhost:11434', timeout=httpx.Timeout(20.0))
 
             # Verify model exists
             response = self.client.list()
