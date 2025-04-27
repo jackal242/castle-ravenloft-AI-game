@@ -2,6 +2,7 @@ import random
 import json
 import os
 from src.tile_manager import TileManager
+from collections import Counter
 
 class EncounterGenerator:
     def __init__(self, tile_manager, local_ai=False, model="mistral", setting="ravenloft", debug=False):
@@ -47,9 +48,13 @@ class EncounterGenerator:
 
         try:
             xp_budget = self._get_xp_budget(players, level, skull)
-            # Pass all creatures without CR filtering
             selected = self._select_monsters(self.creatures, xp_budget, themes, self.theme_map, skull, tile["type"])
-            encounter_text = "\n".join(f"- {c['name']} (CR {c['cr']}, {c['xp']} XP)" for c in selected)
+            # Group and count creatures
+            creature_counts = Counter((c['name'], c['cr'], c['xp']) for c in selected)
+            # Sort by count (descending), then by name for ties
+            sorted_counts = sorted(creature_counts.items(), key=lambda x: (-x[1], x[0][0]))
+            encounter_text = "\n".join(f"{count} - {name} (CR {cr}, {xp} XP)" 
+                                     for ((name, cr, xp), count) in sorted_counts)
             total_xp = sum(int(c['xp']) for c in selected)
         except Exception as e:
             print(f"Creature data failed: {e}. Using fallback.")
@@ -85,49 +90,126 @@ class EncounterGenerator:
     def _select_monsters(self, creatures, xp_budget, themes, theme_map, skull, tile_type):
         selected = []
         current_xp = 0
-        max_attempts = 20
+        max_attempts = 50
+        min_xp_target = int(xp_budget * 0.8)  # e.g., 1600 for 2000 budget
+        max_xp_target = int(xp_budget * 1.2)  # e.g., 2400 for 2000 budget
+        max_monsters = 15
         attempts = 0
-        min_xp_target = int(xp_budget * 0.8)  # 1600 for 2000 budget
-        max_xp_target = int(xp_budget * 1.2)  # 2400 for 2000 budget
-        target_count = random.randint(3, 5) if skull else random.randint(2, 4)
+        selected_types = set()
 
-        while current_xp < min_xp_target and attempts < max_attempts and len(selected) < target_count:
+        # Determine target number of unique creatures
+        target_unique = random.choices(
+            [1, 2, 3, 4, 5],
+            weights=[0.56, 0.19, 0.10, 0.10, 0.05],
+            k=1
+        )[0]
+
+        # Get thematic creatures
+        thematic_names = set()
+        for theme in themes:
+            thematic_names.update(theme_map.get(theme, []))
+        thematic_creatures = [c for c in creatures if c["name"] in thematic_names]
+        if not thematic_creatures:
+            thematic_creatures = creatures
+            if self.debug:
+                print(f"No thematic creatures for themes {themes}, falling back to all creatures.")
+
+        if self.debug:
+            print(f"Thematic creatures for {tile_type}: {[c['name'] for c in thematic_creatures]}")
+            print(f"Target unique creatures: {target_unique}")
+
+        # Handle different cases based on target_unique
+        if target_unique <= 2:  # Single or pair of big creatures
+            big_creatures = [c for c in thematic_creatures if int(c['xp']) >= 200]  # Lowered threshold
+            if big_creatures:
+                for _ in range(target_unique):
+                    if current_xp >= min_xp_target or len(selected) >= max_monsters:
+                        break
+                    remaining_xp = max_xp_target - current_xp
+                    valid = [c for c in big_creatures if int(c['xp']) <= remaining_xp and
+                            (c['name'] in selected_types or len(selected_types) < target_unique)]
+                    if not valid:
+                        valid = [c for c in creatures if int(c['xp']) <= remaining_xp and
+                                int(c['xp']) >= 200 and
+                                (c['name'] in selected_types or len(selected_types) < target_unique)]
+                        if not valid:
+                            break
+                    weights = [max(1, int(c['xp'])) for c in valid]  # Favor higher XP
+                    monster = random.choices(valid, weights=weights, k=1)[0]
+                    selected.append(monster)
+                    selected_types.add(monster['name'])
+                    current_xp += int(monster['xp'])
+                    attempts += 1
+                    if self.debug:
+                        print(f"Selected {monster['name']} ({monster['xp']} XP), current total: {current_xp} XP")
+
+        else:  # Group of 3, 4, or 5 creatures
+            # Always start with a small group of creatures
+            small_creatures = [c for c in thematic_creatures if int(c['xp']) <= 200]
+            if small_creatures:
+                group_size = min(random.randint(3, 6), max_monsters - len(selected))
+                small_group = []
+                for _ in range(group_size):
+                    valid = [c for c in small_creatures if
+                            (c['name'] in selected_types or len(selected_types) < target_unique)]
+                    if not valid:
+                        break
+                    weights = [max(1, 1000 - int(c['xp'])) for c in valid]
+                    monster = random.choices(valid, weights=weights, k=1)[0]
+                    small_group.append(monster)
+                    selected_types.add(monster['name'])
+                selected.extend(small_group)
+                current_xp += sum(int(c['xp']) for c in small_group)
+                if self.debug:
+                    print(f"Added group of small creatures: {[c['name'] for c in small_group]}, total XP: {current_xp}")
+
+            # Continue adding to reach XP budget
+            while current_xp < min_xp_target and len(selected) < max_monsters and attempts < max_attempts:
+                remaining_xp = max_xp_target - current_xp
+                valid = [c for c in thematic_creatures if int(c['xp']) <= remaining_xp and
+                        (c['name'] in selected_types or len(selected_types) < target_unique)]
+                if not valid:
+                    if self.debug:
+                        print(f"No valid thematic creatures with XP <= {remaining_xp}, switching to all creatures.")
+                    valid = [c for c in creatures if int(c['xp']) <= remaining_xp and
+                            (c['name'] in selected_types or len(selected_types) < target_unique)]
+                    if not valid:
+                        break
+                weights = [max(1, 500 - int(c['xp']) / 2) for c in valid]  # Favor medium XP
+                monster = random.choices(valid, weights=weights, k=1)[0]
+                selected.append(monster)
+                selected_types.add(monster['name'])
+                current_xp += int(monster['xp'])
+                attempts += 1
+                if self.debug:
+                    print(f"Selected {monster['name']} ({monster['xp']} XP), current total: {current_xp} XP")
+
+        # Final check to ensure XP budget is met
+        while current_xp < min_xp_target:
             remaining_xp = max_xp_target - current_xp
-            # Build list of thematic creatures
-            thematic_creatures = [
-                c for c in creatures
-                for theme in themes
-                if c["name"] in theme_map.get(theme, [])
-            ]
-            # Select thematic creatures that fit XP budget
-            valid = [c for c in thematic_creatures if int(c['xp']) <= remaining_xp]
-            # Fallback to all creatures if no thematic options
+            valid = [c for c in thematic_creatures if int(c['xp']) <= remaining_xp and
+                    (c['name'] in selected_types or len(selected_types) < target_unique)]
             if not valid:
                 valid = [c for c in creatures if int(c['xp']) <= remaining_xp]
-
             if not valid:
                 break
-
-            # Sort by XP descending to prefer stronger creatures
-            valid.sort(key=lambda x: int(x['xp']), reverse=True)
-            # Ensure we don’t exceed max XP
-            valid = [c for c in valid if current_xp + int(c['xp']) <= max_xp_target]
-            if not valid:
-                break
-
-            # Select from top half for variety and challenge
-            top_half = valid[:max(1, len(valid)//2)]
-            monster = random.choice(top_half)
+            weights = [max(1, int(c['xp'])) for c in valid]  # Favor high XP
+            monster = random.choices(valid, weights=weights, k=1)[0]
             selected.append(monster)
+            selected_types.add(monster['name'])
             current_xp += int(monster['xp'])
-            attempts += 1
+            if self.debug:
+                print(f"Added final monster to meet XP: {monster['name']} ({monster['xp']} XP), total: {current_xp} XP")
 
-        if not selected:  # Ensure at least one monster
-            valid = [c for c in creatures if int(c['xp']) <= xp_budget]
+        if not selected or current_xp < min_xp_target / 2:  # Ensure at least half the budget
+            valid = [c for c in creatures if int(c['xp']) <= xp_budget and int(c['xp']) >= 200]
             if valid:
-                selected.append(random.choice(valid))
+                monster = random.choice(valid)
+                selected.append(monster)
+                if self.debug:
+                    print(f"Added fallback monster: {monster['name']} ({monster['xp']} XP)")
 
-        return selected[:5]  # Cap at 5 monsters
+        return selected
 
     def _fallback_encounter(self, tile_name, players, level, tile):
         max_cr = max(1, level)

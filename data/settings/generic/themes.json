@@ -27,7 +27,7 @@
     "Arcane Experiments": ["Homunculus", "Invisible Stalker", "Shield Guardian", "Notion Thief"],
     "Forest Dwellers": ["Treant", "Dryad", "Satyr", "Centaur", "Pixie", "Sprite"],
     "Swamp and Marsh": ["Shambling Mound", "Bullywug", "Hydra", "Will-o'-Wisp", "Needle Blight", "Vine Blight"],
-    "Mountain and Cave": ["Bulette", "Remorhaz", "Roper", "Umber Hulk", "Grick"],
+    "Mountain and Cave": ["Bulette", "Remorhaz", "Roper", "Umber Hulk", "Grick", "Kobold", "Goblin", "Hobgoblin", "Orc", "Bugbear", "Bullywug"], 
     "Desert and Wasteland": ["Basilisk", "Dust Mephit", "Mummy", "Mummy Lord"],
     "Underdark Inhabitants": ["Duergar", "Deep Gnome", "Drow", "Drider"],
     "Extraplanar Visitors": ["Githyanki Warrior", "Githyanki Knight", "Githzerai Monk", "Githzerai Zerth", "Slaad"],
