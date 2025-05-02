@@ -1,42 +1,397 @@
 {
-    "Necrotic Crypt Dwellers": ["Skeleton", "Zombie", "Ghast", "Wight", "Wraith", "Vampire Spawn", "Ghost", "Specter", "Poltergeist", "Revenant", "Shadow", "Boneless", "Swarm of Undead Bats", "Swarm of Undead Rats", "Flameskull", "Deathlock", "Crawling Claw", "Skull Swarm", "Mummy", "Living Dead Barovian Peasant"],
-    "Haunted Spirits": ["Ghost", "Specter", "Wraith", "Poltergeist", "Phantom Warrior", "Revenant", "Shadow", "Banshee"],
-    "Vampiric Bloodlines": ["Vampire Spawn", "Strahd Zombie", "Vampiric Mist", "Vampire"],
-    "Wild Beasts of the Night": ["Giant Spider", "Dire Wolf", "Swarm of Bats", "Swarm of Rats", "Shadow Mastiff", "Phase Spider"],
-    "Insectoid Swarms": ["Swarm of Rats", "Giant Centipede", "Stirge", "Will-o'-Wisp"],
-    "Tribal Raiders": ["Kobold", "Goblin", "Hobgoblin", "Orc", "Bugbear", "Bullywug"],
-    "Cursed Fey": ["Green Hag", "Night Hag", "Banshee", "Dryad", "Pixie", "Satyr"],
-    "Arcane Guardians": ["Flameskull", "Deathlock", "Helmed Horror", "Spectator"],
-    "Subterranean Terrors": ["Grick", "Cloaker", "Umber Hulk", "Roper", "Grell"],
-    "Infernal Legions": ["Imp", "Hell Hound", "Barbed Devil", "Bearded Devil", "Bone Devil", "Chain Devil", "Erinyes", "Horned Devil", "Ice Devil", "Pit Fiend", "Spined Devil"],
-    "Abyssal Horrors": ["Balor", "Barlgura", "Chasme", "Dretch", "Glabrezu", "Goristro", "Hezrou", "Manes", "Marilith", "Nalfeshnee", "Quasit", "Shadow Demon", "Vrock", "Yochlol"],
-    "Elemental Forces": ["Air Elemental", "Earth Elemental", "Fire Elemental", "Water Elemental", "Dust Mephit", "Ice Mephit", "Magma Mephit", "Mud Mephit", "Smoke Mephit", "Steam Mephit", "Fire Snake", "Salamander"],
-    "Genie Masters": ["Djinni", "Efreeti", "Marid", "Dao"],
-    "Psionic Aberrations": ["Mind Flayer", "Beholder", "Aboleth", "Death Tyrant", "Chuul", "Grell", "Intellect Devourer", "Slaad"],
-    "Draconic Majesty": ["Young Red Dragon", "Ancient Black Dragon", "Adult Blue Dragon", "Young Green Dragon", "Ancient Red Dragon", "Adult White Dragon", "Young Brass Dragon", "Adult Bronze Dragon", "Young Copper Dragon", "Adult Gold Dragon", "Young Silver Dragon", "Dragon Turtle"],
-    "Wyrmlings and Drakes": ["Black Dragon Wyrmling", "Blue Dragon Wyrmling", "Green Dragon Wyrmling", "Red Dragon Wyrmling", "White Dragon Wyrmling", "Brass Dragon Wyrmling", "Bronze Dragon Wyrmling", "Copper Dragon Wyrmling", "Gold Dragon Wyrmling", "Silver Dragon Wyrmling", "Pseudodragon", "Faerie Dragon", "Wyvern"],
-    "Constructed Defenders": ["Animated Armor", "Helmed Horror", "Gargoyle", "Rug of Smothering", "Flying Sword", "Shield Guardian", "Clay Golem", "Flesh Golem", "Iron Golem", "Stone Golem"],
-    "Fungal Growth": ["Myconid Adult", "Myconid Sovereign", "Myconid Sprout", "Gas Spore", "Shrieker", "Violet Fungus"],
-    "Aquatic Dwellers": ["Merfolk", "Merrow", "Sahuagin", "Kuo-Toa", "Plesiosaurus"],
-    "Celestial Prisoners": ["Deva", "Planetar", "Solar", "Empyrean", "Couatl", "Unicorn"],
-    "Giant Clans": ["Hill Giant", "Stone Giant", "Fire Giant", "Frost Giant", "Cloud Giant", "Storm Giant", "Ogre", "Troll", "Ettin", "Fomorian"],
-    "Ooze and Slime": ["Black Pudding", "Gelatinous Cube", "Gray Ooze", "Ochre Jelly"],
-    "Shapechangers and Doppelgangers": ["Doppelganger", "Werebear", "Wereboar", "Wererat", "Weretiger", "Werewolf", "Rakshasa", "Yuan-Ti Malison", "Yuan-Ti Pureblood"],
-    "Undead Beasts": ["Skeleton", "Zombie", "Ghast", "Ghoul", "Wight", "Wraith", "Vampire Spawn", "Strahd Zombie", "Vampiric Mist", "Ghost", "Specter", "Poltergeist", "Phantom Warrior", "Revenant", "Shadow", "Boneless", "Swarm of Undead Bats", "Swarm of Undead Rats", "Flameskull", "Deathlock", "Crawling Claw", "Skull Swarm", "Mummy", "Living Dead Barovian Peasant", "Death Knight", "Demilich", "Dracolich"],
-    "Demonic Beasts": ["Nightmare", "Hell Hound", "Chimera", "Manticore", "Peryton"],
-    "Arcane Experiments": ["Homunculus", "Invisible Stalker", "Shield Guardian", "Notion Thief"],
-    "Forest Dwellers": ["Treant", "Dryad", "Satyr", "Centaur", "Pixie", "Sprite"],
-    "Swamp and Marsh": ["Shambling Mound", "Bullywug", "Hydra", "Will-o'-Wisp", "Needle Blight", "Vine Blight"],
-    "Mountain and Cave": ["Bulette", "Remorhaz", "Roper", "Umber Hulk", "Grick", "Kobold", "Goblin", "Hobgoblin", "Orc", "Bugbear", "Bullywug"], 
-    "Desert and Wasteland": ["Basilisk", "Dust Mephit", "Mummy", "Mummy Lord"],
-    "Underdark Inhabitants": ["Duergar", "Deep Gnome", "Drow", "Drider"],
-    "Extraplanar Visitors": ["Githyanki Warrior", "Githyanki Knight", "Githzerai Monk", "Githzerai Zerth", "Slaad"],
-    "Cursed Nobility": ["Ghost of a Betrayed Bride", "Undead Noble Court", "Vampire"],
-    "Menagerie of Monsters": ["Ankheg", "Behir", "Displacer Beast", "Griffon", "Hippogriff", "Manticore", "Minotaur", "Owlbear", "Roc"],
-    "Arcane Libraries": ["Archmage", "Mage", "Notion Thief", "Lich"],
-    "Forgotten Tombs": ["Mummy", "Mummy Lord", "Death Knight", "Demilich"],
-    "Infested Ruins": ["Rug of Smothering", "Crawling Claw", "Skull Swarm", "Gray Ooze", "Ochre Jelly"],
-    "Enchanted Gardens": ["Pixie", "Sprite", "Faerie Dragon", "Dryad", "Satyr"],
-    "Frozen Wastes": ["Yeti", "White Dragon", "Frost Giant", "Remorhaz"],
-    "Volcanic Depths": ["Fire Giant", "Magma Mephit", "Salamander", "Efreeti"]
+  "dark": [
+    "Shadow",
+    "Darkmantle",
+    "Cloaker",
+    "Shadow Demon"
+  ],
+  "claustrophobic": [
+    "Swarm of Bats",
+    "Swarm of Rats",
+    "Giant Centipede"
+  ],
+  "ancient": [
+    "Skeleton",
+    "Zombie",
+    "Ghoul",
+    "Ghast",
+    "Wraith",
+    "Ghost",
+    "Mummy",
+    "Lich",
+    "Demilich",
+    "Phantom Warrior",
+    "Dracolich"
+  ],
+  "monstrous": [
+    "Otyugh",
+    "Grick",
+    "Mimic",
+    "Aboleth",
+    "Beholder",
+    "Chuul",
+    "Kraken",
+    "Tarrasque",
+    "Behir"
+  ],
+  "underground": [
+    "Ankheg",
+    "Bulette",
+    "Purple Worm",
+    "Grimlock",
+    "Svirfneblin"
+  ],
+  "echoing": [
+    "Swarm of Bats",
+    "Ghast",
+    "Wraith",
+    "Ghost",
+    "Harpy"
+  ],
+  "damp": [
+    "Giant Centipede",
+    "Carrion Crawler",
+    "Stirge",
+    "Ochre Jelly",
+    "Mud Mephit",
+    "Bullywug",
+    "Lizardfolk"
+  ],
+  "perilous": [
+    "Roc",
+    "Hydra",
+    "Dragon Turtle"
+  ],
+  "abyss": [
+    "Balor",
+    "Pit Fiend"
+  ],
+  "windy": [
+    "Air Elemental",
+    "Djinni",
+    "Wyvern"
+  ],
+  "falling": [
+    "Aarakocra",
+    "Peryton"
+  ],
+  "crumbling": [
+    "Rust Monster",
+    "Dust Mephit",
+    "Gnell",
+    "Gnell Pack Lord",
+    "Gnell Fang of Yeenoghu"
+  ],
+  "wild": [
+    "Dire Wolf",
+    "Green Hag",
+    "Dryad",
+    "Satyr",
+    "Treant",
+    "Shambling Mound"
+  ],
+  "haunted": [
+    "Ghost",
+    "Specter",
+    "Wraith",
+    "Poltergeist",
+    "Banshee",
+    "Revenant",
+    "Shadow"
+  ],
+  "secrets": [
+    "Doppelganger",
+    "Spy",
+    "Notion Thief",
+    "Rakshasa"
+  ],
+  "overgrown": [
+    "Vine Blight",
+    "Twig Blight",
+    "Needle Blight"
+  ],
+  "hidden": [
+    "Mimic",
+    "Flumph",
+    "Piercer",
+    "Sprite",
+    "Pixie"
+  ],
+  "nature": [
+    "Dryad",
+    "Druid",
+    "Sprite",
+    "Pixie",
+    "Treant"
+  ],
+  "fey": [
+    "Green Hag",
+    "Night Hag",
+    "Dryad",
+    "Satyr",
+    "Pixie",
+    "Sprite",
+    "Faerie Dragon"
+  ],
+  "narrow": [
+    "Giant Centipede",
+    "Stirge",
+    "Grick",
+    "Hook Horror"
+  ],
+  "confined": [
+    "Swarm of Rats",
+    "Otyugh",
+    "Lemure"
+  ],
+  "labyrinthine": [
+    "Minotaur",
+    "Minotaur Skeleton"
+  ],
+  "traps": [
+    "Kobold",
+    "Goblin",
+    "Mimic",
+    "Rug of Smothering"
+  ],
+  "spacious": [
+    "Chimera",
+    "Hydra",
+    "Behir"
+  ],
+  "ornate": [
+    "Noble",
+    "Archmage",
+    "Planetar",
+    "Solar"
+  ],
+  "powerful": [
+    "Adult Red Dragon",
+    "Ancient Red Dragon",
+    "Death Knight",
+    "Lich"
+  ],
+  "secure": [
+    "Helmed Horror",
+    "Clay Golem",
+    "Iron Golem",
+    "Shield Guardian"
+  ],
+  "treasure": [
+    "Adult Gold Dragon",
+    "Ancient Gold Dragon",
+    "Aboleth",
+    "Mimic"
+  ],
+  "arcane": [
+    "Mage",
+    "Drow Mage",
+    "Beholder",
+    "Grell",
+    "Flameskull"
+  ],
+  "guarded": [
+    "Animated Armor",
+    "Gargoyle",
+    "Guard",
+    "Knight",
+    "Veteran"
+  ],
+  "imprisonment": [
+    "Chain Devil",
+    "Lemure",
+    "Ghast"
+  ],
+  "despair": [
+    "Specter",
+    "Ghost of a Betrayed Bride"
+  ],
+  "torture": [
+    "Bearded Devil",
+    "Chasme"
+  ],
+  "forgotten": [
+    "Demilich",
+    "Revenant",
+    "Ancient Black Dragon",
+    "Ancient Blue Dragon"
+  ],
+  "secluded": [
+    "Sea Hag",
+    "Merfolk",
+    "Merrow"
+  ],
+  "waterfall": [
+    "Water Elemental",
+    "Water Weird"
+  ],
+  "mysterious": [
+    "Will-o'-Wisp",
+    "Mind Flayer",
+    "Gibbering Mouther"
+  ],
+  "territorial": [
+    "Ankheg",
+    "Allosaurus"
+  ],
+  "savage": [
+    "Berserker",
+    "Gnell"
+  ],
+  "defended": [
+    "Guard",
+    "Knight",
+    "Animated Armor"
+  ],
+  "stench": [
+    "Black Pudding",
+    "Ghoul",
+    "Hezrou"
+  ],
+  "holy": [
+    "Couatl",
+    "Deva",
+    "Planetar",
+    "Solar"
+  ],
+  "desecrated": [
+    "Deathlock",
+    "Flameskull"
+  ],
+  "exposed": [
+    "Wyvern",
+    "Roc"
+  ],
+  "panoramic": [
+    "Ancient Dragon"
+  ],
+  "isolated": [
+    "Aarakocra"
+  ],
+  "weathered": [
+    "Azer"
+  ],
+  "shadowy": [
+    "Shadow",
+    "Darkmantle"
+  ],
+  "crawling": [
+    "Giant Centipede",
+    "Carrion Crawler"
+  ],
+  "suffocating": [
+    "Swarm of Bats",
+    "Swarm of Bats"
+  ],
+  "vermin": [
+    "Swarm of Bats",
+    "Swarm of Rats",
+    "Giant Centipede",
+    "Stirge"
+  ],
+  "burrows": [
+    "Ankheg",
+    "Bulette"
+  ],
+  "crowded": [
+    "Goblin",
+    "Kobold"
+  ],
+  "skittering": [
+    "Swarm of Rats",
+    "Giant Centipede"
+  ],
+  "disease": [
+    "Black Pudding",
+    "Swarm of Rats"
+  ],
+  "nook": [
+    "Spy"
+  ],
+  "surprise": [
+    "Mimic",
+    "Cloaker"
+  ],
+  "fortified": [
+    "Guard",
+    "Knight"
+  ],
+  "decayed": [
+    "Zombie",
+    "Ghoul",
+    "Black Pudding"
+  ],
+  "defensive": [
+    "Construct"
+  ],
+  "history": [
+    "Ancient Dragon",
+    "Ancient Black Dragon"
+  ],
+  "vulnerable": [
+    "Commoner"
+  ],
+  "watchful": [
+    "Guard"
+  ],
+  "desolate": [
+    "Dust Mephit"
+  ],
+  "junction": [
+    "Bandit"
+  ],
+  "ominous": [
+    "Cambion",
+    "Death Knight"
+  ],
+  "uncertain": [
+    "Gibbering Mouther"
+  ],
+  "travelers": [
+    "Werewolf",
+    "Werebear",
+    "Weretiger"
+  ],
+  "necrotic": [
+    "Ghoul",
+    "Ghast",
+    "Wraith",
+    "Shadow"
+  ],
+  "crypt": [
+    "Giant Spider",
+    "Grick",
+    "Carrion Crawler"
+  ],
+  "unholy": [
+    "Cambion",
+    "Cultist"
+  ],
+  "spirits": [
+    "Ghost",
+    "Specter",
+    "Wraith",
+    "Poltergeist"
+  ],
+  "forest": [
+    "Giant Spider",
+    "Dire Wolf",
+    "Green Hag"
+  ],
+  "swamp": [
+    "Bullywug",
+    "Lizardfolk"
+  ],
+  "marsh": [
+    "Will-o'-Wisp",
+    "Shambling Mound"
+  ],
+  "insectoid": [
+    "Giant Centipede",
+    "Swarm of Bats"
+  ],
+  "swarms": [
+    "Swarm of Bats",
+    "Swarm of Rats"
+  ]
 }

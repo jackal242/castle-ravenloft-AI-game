@@ -19,17 +19,16 @@ class AIDescription:
             if result != 0:
                 raise ConnectionError("Ollama server not running on localhost:11434")
 
-            # Initialize client with reduced timeout
-            self.client = Client(host='http://localhost:11434', timeout=httpx.Timeout(20.0))
+            # Initialize client with increased timeout
+            self.client = Client(host='http://localhost:11434', timeout=httpx.Timeout(60.0))
 
             # Verify model exists
             response = self.client.list()
             available_models = []
             for model in response.get('models', []):
                 name = getattr(model, 'model', '')
-                base_name = name.split(':')[0] if ':' in name else name
-                if base_name and base_name not in available_models:
-                    available_models.append(base_name)
+                if name and name not in available_models:
+                    available_models.append(name)  # Use full model name, e.g., gemma3:1b
             if not available_models:
                 raise ValueError("No models found in Ollama")
             if self.model not in available_models:
@@ -95,8 +94,9 @@ class AIDescription:
 
         try:
             print("Generating AI description...", flush=True)
-            response = self.client.generate(model=self.model, prompt=prompt, stream=False, options={'num_predict': 500})
+            response = self.client.generate(model=self.model, prompt=prompt, stream=False, options={'num_predict': 70})
             description = response['response'].strip()
+            description = " ".join(description.split()[:50])  # Truncate to 50 words
             # Format description with line breaks
             formatted_description = self._format_description(description, line_length=80)
             print()  # Newline
