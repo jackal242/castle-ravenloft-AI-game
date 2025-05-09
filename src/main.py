@@ -6,7 +6,7 @@ from src.tile_manager import TileManager
 def main():
     parser = argparse.ArgumentParser(description="Castle Ravenloft Encounter Generator")
     parser.add_argument("--local-ai", action="store_true", help="Use local Ollama server for descriptions")
-    parser.add_argument("--model", type=str, default="mistral", help="Ollama model to use with --local-ai (e.g., mistral, phi3)")
+    parser.add_argument("--model", type=str, default="gemma2:2b ", help="Ollama model to use with --local-ai (e.g., gemma2:2b , phi3:mini)")
     parser.add_argument("--numplayers", type=int, default=4, help="Number of players")
     parser.add_argument("--level", type=int, default=5, help="Player level")
     parser.add_argument("--setting", type=str, default="ravenloft", help="Game setting (e.g., ravenloft, generic)")

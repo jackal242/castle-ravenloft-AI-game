@@ -5,7 +5,7 @@ from src.tile_manager import TileManager
 from collections import Counter
 
 class EncounterGenerator:
-    def __init__(self, tile_manager, local_ai=False, model="mistral", setting="ravenloft", debug=False):
+    def __init__(self, tile_manager, local_ai=False, model="gemma2:2b ", setting="ravenloft", debug=False):
         self.tiles = tile_manager
         self.local_ai = local_ai
         self.model = model
